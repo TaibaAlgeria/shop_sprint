@@ -1,0 +1,31 @@
+# اسم سير العمل الذي سيظهر في تبويب "Actions" في GitHub
+name: Invoke Supabase Edge Function Cron
+
+# متى يتم تشغيل هذا السير العمل
+on:
+  workflow_dispatch: # يسمح بتشغيله يدوياً من واجهة GitHub
+  schedule:
+    # ┏ BASH: 0 0 * * * (كل يوم عند منتصف الليل)
+    # ┃ 
+    # ┃ MIN: 0-59 (كل 5 دقائق: '*/5')
+    # ┃ HOUR: 0-23
+    # ┃ DAY OF MONTH: 1-31
+    # ┃ MONTH: 1-12
+    # ┃ DAY OF WEEK: 0-6 (Sunday-Saturday)
+    # ┗
+    # يشغل السير العمل كل 5 دقائق
+    - cron: '*/5 * * * *'
+
+# المهام التي سيتم تنفيذها
+jobs:
+  cron:
+    runs-on: ubuntu-latest # استخدام أحدث نسخة من Ubuntu
+
+    steps:
+      # الخطوة الأولى: استدعاء دالة إرسال الإشعارات
+      - name: Send restock notifications
+        # استخدام أمر curl لإرسال طلب POST إلى دالة الـ Edge Function
+        run: |
+          curl -i --location --request POST '<YOUR_EDGE_FUNCTION_URL>' \
+          --header 'Authorization: Bearer <YOUR_SUPABASE_SERVICE_ROLE_KEY>'
+        # **ملاحظة هامة:** لا تضع المفاتيح الحقيقية هنا مباشرة! سنستخدم Secrets.
